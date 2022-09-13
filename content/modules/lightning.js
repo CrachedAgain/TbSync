@@ -338,7 +338,6 @@ var lightning = {
   TbCalendar : class {
     constructor(calendar, folderData) {
       this._calendar = calendar;
-      this._promisifyCalendar = TbSync.lightning.cal.async.promisifyCalendar(this._calendar.wrappedJSObject);
       this._folderData = folderData;
      }
 
@@ -346,10 +345,6 @@ var lightning = {
       return this._calendar;
     }
     
-    get promisifyCalendar() {
-      return this._promisifyCalendar;
-    }
-
     get logUserChanges() {
       return this._folderData.targetData.logUserChanges;
     }
@@ -386,7 +381,7 @@ var lightning = {
       if (pretagChangelogWithByServerEntry) {
         tbItem.changelogStatus = "added_by_server";
       }
-      return await this._promisifyCalendar.adoptItem(tbItem._item);
+      return await this._calendar.adoptItem(tbItem._item);
     }
     
     async modifyItem(tbNewItem, tbOldItem, pretagChangelogWithByServerEntry = true) {
@@ -396,21 +391,20 @@ var lightning = {
         tbNewItem.changelogStatus = "modified_by_server";
       }
       
-      return await this._promisifyCalendar.modifyItem(tbNewItem._item, tbOldItem._item); 
+      return await this._calendar.modifyItem(tbNewItem._item, tbOldItem._item); 
     }        
     
     async deleteItem(tbItem, pretagChangelogWithByServerEntry = true) {
       if (pretagChangelogWithByServerEntry) {
         tbItem.changelogStatus = "deleted_by_server";
       }
-      return await this._promisifyCalendar.deleteItem(tbItem._item); 
+      return await this._calendar.deleteItem(tbItem._item); 
     }
     
     // searchId is interpreted as the primaryKeyField, which is the UID for this target
     async getItem (searchId) {
-      let item = await this._promisifyCalendar.getItem(searchId); 
-      if (item.length == 1) return new TbSync.lightning.TbItem(this, item[0]);
-      if (item.length > 1) throw "Oops: getItem returned <"+item.length+"> elements!";
+      let item = await this._calendar.getItem(searchId); 
+      return new TbSync.lightning.TbItem(this, item);
       return null;
     }
 
@@ -420,7 +414,7 @@ var lightning = {
     }
 
     async getAllItems () {
-      return await this._promisifyCalendar.getAllItems(); 
+      return await this._calendar.getAllItems(); 
     }
       
   
