@@ -105,7 +105,7 @@ var providers = {
           }
         }
         
-        for (let calendar of TbSync.lightning.cal.getCalendarManager().getCalendars({})) {
+        for (let calendar of TbSync.lightning.cal.manager.getCalendars({})) {
           let storedProvider = calendar.getProperty("tbSyncProvider");
           if (provider == storedProvider && calendar.type == "storage" && providerData.getFolders({"target": calendar.id}).length == 0) {
             let name = calendar.name;
