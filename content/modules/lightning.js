@@ -403,8 +403,12 @@ var lightning = {
     
     // searchId is interpreted as the primaryKeyField, which is the UID for this target
     async getItem (searchId) {
-      let item = await this._calendar.getItem(searchId); 
-      return new TbSync.lightning.TbItem(this, item);
+      let item = await this._calendar.getItem(searchId);
+      if (item) {
+        return new TbSync.lightning.TbItem(this, item);
+      } else {
+        return null;
+      }
     }
 
     async getItemFromProperty(property, value) {
