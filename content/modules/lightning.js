@@ -27,8 +27,8 @@ var lightning = {
     try {
       TbSync.lightning.cal = ChromeUtils.import("resource:///modules/calendar/calUtils.jsm").cal;
       TbSync.lightning.ICAL = ChromeUtils.import("resource:///modules/calendar/Ical.jsm").ICAL;
-      TbSync.lightning.cal.getCalendarManager().addCalendarObserver(this.calendarObserver);
-      TbSync.lightning.cal.getCalendarManager().addObserver(this.calendarManagerObserver);
+      TbSync.lightning.cal.manager.addCalendarObserver(this.calendarObserver);
+      TbSync.lightning.cal.manager.addObserver(this.calendarManagerObserver);
     } catch (e) {
       TbSync.dump("Check4Lightning","Error during lightning module import: " + e.toString() + "\n" + e.stack);
       Components.utils.reportError(e);
@@ -37,8 +37,8 @@ var lightning = {
 
   unload: async function () {
     //removing global observer
-    TbSync.lightning.cal.getCalendarManager().removeCalendarObserver(this.calendarObserver);
-    TbSync.lightning.cal.getCalendarManager().removeObserver(this.calendarManagerObserver);
+    TbSync.lightning.cal.manager.removeCalendarObserver(this.calendarObserver);
+    TbSync.lightning.cal.manager.removeObserver(this.calendarManagerObserver);
 
     //remove listeners on global sync buttons
     if (TbSync.window.document.getElementById("calendar-synchronize-button")) {
@@ -67,7 +67,7 @@ var lightning = {
     
     // Check, if the target exists and return true/false.
     hasTarget() {
-      let calManager = TbSync.lightning.cal.getCalendarManager();
+      let calManager = TbSync.lightning.cal.manager;
       let target = this._folderData.getFolderProperty("target");
       let calendar = calManager.getCalendarById(target);
       
@@ -79,7 +79,7 @@ var lightning = {
     // If the target does not exist, it should be created. Throw a simple Error, if that
     // failed.
     async getTarget() {
-      let calManager = TbSync.lightning.cal.getCalendarManager();
+      let calManager = TbSync.lightning.cal.manager;
       let target = this._folderData.getFolderProperty("target");
       let calendar = calManager.getCalendarById(target);
       
@@ -102,13 +102,13 @@ var lightning = {
      *
      */
     removeTarget() {
-      let calManager = TbSync.lightning.cal.getCalendarManager();
+      let calManager = TbSync.lightning.cal.manager;
       let target = this._folderData.getFolderProperty("target");
       let calendar = calManager.getCalendarById(target);
 
       try {
         if (calendar) {
-          TbSync.lightning.cal.getCalendarManager().removeCalendar(calendar);
+          TbSync.lightning.cal.manager.removeCalendar(calendar);
         }
       } catch (e) {}
       TbSync.db.clearChangeLog(target);
@@ -123,7 +123,7 @@ var lightning = {
      * 
      */
     disconnectTarget() {
-      let calManager = TbSync.lightning.cal.getCalendarManager();
+      let calManager = TbSync.lightning.cal.manager;
       let target = this._folderData.getFolderProperty("target");
       let calendar = calManager.getCalendarById(target);
 
@@ -141,7 +141,7 @@ var lightning = {
     } 
     
     set targetName(newName) {
-      let calManager = TbSync.lightning.cal.getCalendarManager();
+      let calManager = TbSync.lightning.cal.manager;
       let target = this._folderData.getFolderProperty("target");
       let calendar = calManager.getCalendarById(target);
 
@@ -153,7 +153,7 @@ var lightning = {
     }
   
     get targetName() {
-      let calManager = TbSync.lightning.cal.getCalendarManager();
+      let calManager = TbSync.lightning.cal.manager;
       let target = this._folderData.getFolderProperty("target");
       let calendar = calManager.getCalendarById(target);
 
@@ -224,7 +224,7 @@ var lightning = {
     // replace this with your own implementation to create the actual addressbook,
     // when this class is extended
     async createCalendar(newname) {
-      let calManager = TbSync.lightning.cal.getCalendarManager();
+      let calManager = TbSync.lightning.cal.manager;
       let newCalendar = calManager.createCalendar("storage", Services.io.newURI("moz-storage-calendar://"));
       newCalendar.id = TbSync.lightning.cal.getUUID();
       newCalendar.name = newname;
@@ -664,7 +664,7 @@ var lightning = {
         // we wait a bit and check, if the calendar is back again and ignore the delete event.
         if (aCalendar.type == "caldav") {
           await TbSync.tools.sleep(1500);
-          let calManager = TbSync.lightning.cal.getCalendarManager();          
+          let calManager = TbSync.lightning.cal.manager;          
           for (let calendar of calManager.getCalendars({})) {
             if (calendar.uri.spec == aCalendar.uri.spec) {
               // update the target
@@ -697,7 +697,7 @@ var lightning = {
   
   //this function actually creates a calendar if missing
   prepareAndCreateCalendar: async function (folderData) {       
-    let calManager = TbSync.lightning.cal.getCalendarManager();
+    let calManager = TbSync.lightning.cal.manager;
     let provider = folderData.accountData.getAccountProperty("provider");
 
     //check if  there is a known/cached name, and use that as starting point to generate unique name for new calendar 
