@@ -405,7 +405,6 @@ var lightning = {
     async getItem (searchId) {
       let item = await this._calendar.getItem(searchId); 
       return new TbSync.lightning.TbItem(this, item);
-      return null;
     }
 
     async getItemFromProperty(property, value) {
